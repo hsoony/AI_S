@@ -12,6 +12,20 @@ from tensorflow.contrib.layers import batch_norm
 
 he_init = layers.variance_scaling_initializer()
 
+def conv_depth():
+    bottom_shape = inputs.get_shape().as_list()[3]
+
+    with tf.variable_scope(scope):
+        W = tf.get_variable("W", [ksize, ksize, bottom_shape, num_filter],
+                            initializer=he_init)
+
+        x = tf.nn.depthwise_conv2d(inputs, W, strides=[1, stride, stride, 1],
+                         padding=padding)
+        x = layers.batch_norm(x, is_training=is_training,
+                              decay=0.9, updates_collections=None)
+        x = tf.nn.relu(x)
+
+    return x
 
 
 def conv(inputs, num_filter, ksize, stride, padding='SAME', is_training=True, scope=None):
@@ -72,33 +86,6 @@ def residual_block(inpt, output_depth, down_sample, projection=False):
 
     res = conv2 + input_layer
     return res
-
-def resnet(input,is_train):
-    conv_1 = conv(input, 64, 7, 2, "SAME", is_train, 'conv_1')
-    pool_1 = maxpool(conv_1, 3, 2, "SAME", 'pool_1')
-
-    res_out = pool_1
-    for i in range(3):
-        res_1_0 = conv_preAct(res_out, 64, 3, 1, "SAME", is_train, 'res_1_0' + str(i))
-        res_1_1 = conv_preAct(res_1_0, 64, 3, 1, "SAME", is_train, 'res_1_1' + str(i))
-        res_out = res_out + res_1_1
-
-    res_2_0 = conv_preAct(res_out, 128, 3, 2, "SAME", is_train, 'res_2_0' )
-    res_2_1 = conv_preAct(res_2_0, 128, 3, 1, "SAME", is_train, 'res_2_1' )
-
-    pool_2 = conv_preAct(res_out, 128, 1, 2, "SAME", is_train, 'pool_2')
-    res_out = pool_2 + res_2_1
-
-    for i in range(3):
-        res_2_0 = conv_preAct(res_out, 128, 3, 1, "SAME", is_train, 'res_2_0' + str(i))
-        res_2_1 = conv_preAct(res_2_0, 128, 3, 1, "SAME", is_train, 'res_2_1' + str(i))
-        res_out = res_out + res_2_1
-
-    avg_pool = tf.nn.avg_pool(res_out, ksize=[1, 4, 4, 1],
-                          strides=[1, 1, 1, 1],
-                          padding="VALID")
-    rst = fc(avg_pool, 10, 'logits')
-    return rst
 
 def test(input, is_training):
     conv1 = conv(input, 16, ksize=7, stride=2,

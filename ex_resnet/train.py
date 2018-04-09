@@ -1,10 +1,12 @@
 import os
+import ex_resnet.squeezenet as net
+
 os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
 os.environ["CUDA_VISIBLE_DEVICES"]="0"
 
 import numpy as np
 import tensorflow as tf
-import layers as layers
+
 # TensorFlow 내장 MNIST 데이터셋 모듈
 from tensorflow.examples.tutorials.mnist import input_data
 mnist = input_data.read_data_sets("/data/MNIST", one_hot=True)
@@ -17,7 +19,7 @@ label = tf.placeholder(tf.float32, [None, 10])
 is_training = tf.placeholder(tf.bool)  # 배치 정규화 및 dropout 사용시 필요
 
 x = tf.reshape(inputs, shape=[-1, 28, 28, 1])
-logit = layers.resnet(x, is_training)
+logit = net.inference(x, is_training)
 
 
 
