@@ -19,11 +19,13 @@ hw : squeezenet, mobilenet, shufflenet 구현
 
 6_2018_08_21
  
- classification -> resnet, squeezenet
-0904까지 super resolution -> 구현 
-김형순 : 논문 x , 구현. 
+ 
+classification -> resnet, squeezenet 
+super resolution -> 구현 
 
- object detector -> YOLO, RCNN
- segmentation -> Mask R-CNN ...
- RNN -> LSTM, GRU..
- GAN -> ..style transfer, ...
+
+object detector -> YOLO, RCNN
+segmentation -> Mask R-CNN ...
+RNN -> LSTM, GRU..
+GAN -> ..style transfer, ...
+voice gen -> 
